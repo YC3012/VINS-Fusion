@@ -38,6 +38,7 @@ using namespace std;
 queue<sensor_msgs::ImageConstPtr> image_buf;
 queue<sensor_msgs::PointCloudConstPtr> point_buf;
 queue<nav_msgs::Odometry::ConstPtr> pose_buf;
+queue<nav_msgs::Odometry::ConstPtr> qr_buf;
 queue<Eigen::Vector3d> odometry_buf;
 std::mutex m_buf;
 std::mutex m_process;
@@ -94,6 +95,8 @@ void new_sequence()
         pose_buf.pop();
     while(!odometry_buf.empty())
         odometry_buf.pop();
+    while(!qr_buf.empty())
+        qr_buf.pop();
     m_buf.unlock();
 }
 
@@ -188,6 +191,17 @@ void pose_callback(const nav_msgs::Odometry::ConstPtr &pose_msg)
                                                        pose_msg->pose.pose.orientation.z);
     */
 }
+//CHECK
+void qr_callback(const nav_msgs::Odometry::ConstPtr &qr_msg)
+{
+    //ROS_INFO("qr_callback!");
+    //qr_msg is in camera frame!
+    //TODO: change the frame of qr_msg
+    m_buf.lock();
+    qr_buf.push(qr_msg);
+    m_buf.unlock();
+}
+//CHECK END
 
 void vio_callback(const nav_msgs::Odometry::ConstPtr &pose_msg)
 {
