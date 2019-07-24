@@ -263,6 +263,7 @@ void process()
         sensor_msgs::ImageConstPtr image_msg = NULL;
         sensor_msgs::PointCloudConstPtr point_msg = NULL;
         nav_msgs::Odometry::ConstPtr pose_msg = NULL;
+        nav_msgs::Odometry::ConstPtr qr_msg = NULL;
 
         // find out the messages with same time stamp
         m_buf.lock();
@@ -295,6 +296,16 @@ void process()
                 point_msg = point_buf.front();
                 point_buf.pop();
             }
+            while(!qr_buf.empty()) {
+                if(qr_buf.front()->header.stamp.toSec() != pose_msg->header.stamp.toSec()) {
+                  qr_buf.pop();
+                } else {
+                  qr_msg = qr_buf.front();
+                  qr_buf.pop();//Check
+                  break;
+                }
+            }
+
         }
         m_buf.unlock();
 
