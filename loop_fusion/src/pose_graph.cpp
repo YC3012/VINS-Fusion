@@ -482,8 +482,9 @@ void PoseGraph::optimize4DoF()
             {
                 //CHECK:want to create variable for keyframe[0], which is the Origin
                 if ((*it)->index < first_looped_index && (*it)-> index != 0)
+                  continue;
                 //CHECK END
-                    continue;
+
                 (*it)->local_index = i;
                 Quaterniond tmp_q;
                 Matrix3d tmp_r;
@@ -545,7 +546,7 @@ void PoseGraph::optimize4DoF()
                                                                   t_array[connected_index], 
                                                                   euler_array[i], 
                                                                   t_array[i]);
-                    
+                }
                 //CHECK: add qr edge
                 if((*it)->i_t_qr != Eigen::Vector3d(0, 0, 0) && (*it)->i_r_qr != Eigen::Matrix3d::Identity() && (*it)->index != 0) {
                     has_qr = true;
