@@ -400,6 +400,20 @@ void process()
                   i_t_qr = tic + qic * cam_t_qr;
                   i_r_qr = qic * cam_r_qr;
                 }
+                //Create the fake keyframe for Origin. Only index, vio_T_w_i, vio_R_w_i, and maybe sequence matters.
+                if (frame_index == 0) {
+                    Vector3d T0 = Eigen::Vector3d(0, 0, 0);
+                    Matrix3d R0 = Eigen::Matrix3d::Identity();
+                    KeyFrame* keyframe = new KeyFrame(pose_msg->header.stamp.toSec(), frame_index, T0, R0,
+                                            image, point_3d, point_2d_uv, point_2d_normal,
+                                            point_id, sequence, i_t_qr, i_r_qr);
+                    m_process.lock();
+                    posegraph.addKeyFrame(keyframe, 0); //image incorrect so set flag_detect_loop to be 0
+                    m_process.unlock();
+                    frame_index++;
+                }
+                //CHECK END
+
                 KeyFrame* keyframe = new KeyFrame(pose_msg->header.stamp.toSec(), frame_index, T, R, image,
                                    point_3d, point_2d_uv, point_2d_normal, point_id, sequence, i_t_qr, i_r_qr);
                 m_process.lock();
