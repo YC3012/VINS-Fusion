@@ -514,7 +514,7 @@ int main(int argc, char **argv)
     fout.close();
 
     int USE_IMU = fsSettings["imu"];
-    posegraph.setIMUFlag(USE_IMU);
+    posegraph.setIMUFlag(USE_IMU); //optimaization happens here
     fsSettings.release();
 
     if (LOAD_PREVIOUS_POSE_GRAPH)

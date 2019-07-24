@@ -437,6 +437,8 @@ void PoseGraph::optimize4DoF()
     {
         int cur_index = -1;
         int first_looped_index = -1;
+        bool has_qr = false; // CHECK: Add bool to check if there is qr constraint,
+        // If there isn't, set the Origin pose variable to be constant
         m_optimize_buf.lock();
         while(!optimize_buf.empty())
         {
@@ -478,7 +480,9 @@ void PoseGraph::optimize4DoF()
             int i = 0;
             for (it = keyframelist.begin(); it != keyframelist.end(); it++)
             {
-                if ((*it)->index < first_looped_index)
+                //CHECK:want to create variable for keyframe[0], which is the Origin
+                if ((*it)->index < first_looped_index && (*it)-> index != 0)
+                //CHECK END
                     continue;
                 (*it)->local_index = i;
                 Quaterniond tmp_q;
@@ -542,14 +546,35 @@ void PoseGraph::optimize4DoF()
                                                                   euler_array[i], 
                                                                   t_array[i]);
                     
+                //CHECK: add qr edge
+                if((*it)->i_t_qr != Eigen::Vector3d(0, 0, 0) && (*it)->i_r_qr != Eigen::Matrix3d::Identity() && (*it)->index != 0) {
+                    has_qr = true;
+                    int connected_index = 0;
+                    Vector3d euler_conncected = Utility::R2ypr(q_array[connected_index].toRotationMatrix());
+                    Vector3d relative_t;
+                    relative_t = -(*it)->i_t_qr;
+                    double relative_yaw = Utility::normalizeAngle(Utility::R2ypr((*it)->i_r_qr.transpose()).x());
+                    ceres::CostFunction* cost_function = FourDOFWeightError::Create( relative_t.x(), relative_t.y(), relative_t.z(),
+                                                                               relative_yaw, euler_conncected.y(), euler_conncected.z());
+                    problem.AddResidualBlock(cost_function, NULL, euler_array[connected_index],
+                                                                  t_array[connected_index],
+                                                                  euler_array[i],
+                                                                  t_array[i]);
                 }
-                
+                //CHECK END
                 if ((*it)->index == cur_index)
                     break;
                 i++;
             }
             m_keyframelist.unlock();
 
+            //CHECK
+            if (!has_qr)
+            {
+                problem.SetParameterBlockConstant(euler_array[0]);
+                problem.SetParameterBlockConstant(t_array[0]);
+            }
+            //CHECK END
             ceres::Solve(options, &problem, &summary);
             //std::cout << summary.BriefReport() << "\n";
             
@@ -564,7 +589,7 @@ void PoseGraph::optimize4DoF()
             i = 0;
             for (it = keyframelist.begin(); it != keyframelist.end(); it++)
             {
-                if ((*it)->index < first_looped_index)
+                if ((*it)->index < first_looped_index && (*it)->index != 0)//CHECK: want to update index = 0 as well
                     continue;
                 Quaterniond tmp_q;
                 tmp_q = Utility::ypr2R(Vector3d(euler_array[i][0], euler_array[i][1], euler_array[i][2]));
