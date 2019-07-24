@@ -24,12 +24,14 @@ static void reduceVector(vector<Derived> &v, vector<uchar> status)
 // create keyframe online
 KeyFrame::KeyFrame(double _time_stamp, int _index, Vector3d &_vio_T_w_i, Matrix3d &_vio_R_w_i, cv::Mat &_image,
 		           vector<cv::Point3f> &_point_3d, vector<cv::Point2f> &_point_2d_uv, vector<cv::Point2f> &_point_2d_norm,
-		           vector<double> &_point_id, int _sequence)
+		           vector<double> &_point_id, int _sequence, Vector3d &_i_t_qr, Matrix3d &_i_r_qr)
 {
 	time_stamp = _time_stamp;
 	index = _index;
 	vio_T_w_i = _vio_T_w_i;
 	vio_R_w_i = _vio_R_w_i;
+  i_t_qr =_i_t_qr;
+  i_r_qr =_i_r_qr;
 	T_w_i = vio_T_w_i;
 	R_w_i = vio_R_w_i;
 	origin_vio_T = vio_T_w_i;		

@@ -385,8 +385,23 @@ void process()
                     //printf("u %f, v %f \n", p_2d_uv.x, p_2d_uv.y);
                 }
 
+                //CHECK
+                Vector3d i_t_qr = Eigen::Vector3d(0, 0, 0);
+                Matrix3d i_r_qr = Eigen::Matrix3d::Identity();
+                if (qr_msg != NULL) {
+                  Vector3d cam_t_qr = Vector3d(qr_msg->pose.pose.position.x,
+                                        qr_msg->pose.pose.position.y,
+                                        qr_msg->pose.pose.position.z);
+                  Matrix3d cam_r_qr = Quaterniond(qr_msg->pose.pose.orientation.w,
+                                        qr_msg->pose.pose.orientation.x,
+                                        qr_msg->pose.pose.orientation.y,
+                                        qr_msg->pose.pose.orientation.z).toRotationMatrix();
+
+                  i_t_qr = tic + qic * cam_t_qr;
+                  i_r_qr = qic * cam_r_qr;
+                }
                 KeyFrame* keyframe = new KeyFrame(pose_msg->header.stamp.toSec(), frame_index, T, R, image,
-                                   point_3d, point_2d_uv, point_2d_normal, point_id, sequence);   
+                                   point_3d, point_2d_uv, point_2d_normal, point_id, sequence, i_t_qr, i_r_qr);
                 m_process.lock();
                 start_flag = 1;
                 posegraph.addKeyFrame(keyframe, 1);
