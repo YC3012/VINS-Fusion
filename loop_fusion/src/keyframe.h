@@ -1,8 +1,8 @@
 /*******************************************************
  * Copyright (C) 2019, Aerial Robotics Group, Hong Kong University of Science and Technology
- * 
+ *
  * This file is part of VINS.
- * 
+ *
  * Licensed under the GNU General Public License v3.0;
  * you may not use this file except in compliance with the License.
  *
@@ -44,7 +44,7 @@ class KeyFrame
 {
 public:
 	KeyFrame(double _time_stamp, int _index, Vector3d &_vio_T_w_i, Matrix3d &_vio_R_w_i, cv::Mat &_image,
-			 vector<cv::Point3f> &_point_3d, vector<cv::Point2f> &_point_2d_uv, vector<cv::Point2f> &_point_2d_normal, 
+			 vector<cv::Point3f> &_point_3d, vector<cv::Point2f> &_point_2d_uv, vector<cv::Point2f> &_point_2d_normal,
 			 vector<double> &_point_id, int _sequence, Vector3d &_i_t_qr, Matrix3d &_i_r_qr);
 	KeyFrame(double _time_stamp, int _index, Vector3d &_vio_T_w_i, Matrix3d &_vio_R_w_i, Vector3d &_T_w_i, Matrix3d &_R_w_i,
 			 cv::Mat &_image, int _loop_index, Eigen::Matrix<double, 8, 1 > &_loop_info,
@@ -85,20 +85,20 @@ public:
 
 
 
-	double time_stamp; 
+	double time_stamp;
 	int index;
 	int local_index;
-	Eigen::Vector3d vio_T_w_i; 
-	Eigen::Matrix3d vio_R_w_i; 
-  Eigen::Vector3d i_t_qr;
-	Eigen::Matrix3d i_r_qr;
+	Eigen::Vector3d vio_T_w_i;
+	Eigen::Matrix3d vio_R_w_i;
+  Eigen::Vector3d o_t_i;
+	Eigen::Matrix3d o_r_i;
 	Eigen::Vector3d T_w_i;
 	Eigen::Matrix3d R_w_i;
-	Eigen::Vector3d origin_vio_T;		
+	Eigen::Vector3d origin_vio_T;
 	Eigen::Matrix3d origin_vio_R;
 	cv::Mat image;
 	cv::Mat thumbnail;
-	vector<cv::Point3f> point_3d; 
+	vector<cv::Point3f> point_3d;
 	vector<cv::Point2f> point_2d_uv;
 	vector<cv::Point2f> point_2d_norm;
 	vector<double> point_id;
@@ -111,6 +111,7 @@ public:
 	int sequence;
 
 	bool has_loop;
+	bool has_qr;
 	int loop_index;
 	Eigen::Matrix<double, 8, 1 > loop_info;
 };

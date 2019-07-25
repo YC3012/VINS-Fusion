@@ -458,8 +458,11 @@ void PoseGraph::optimize4DoF()
 
             // w^t_i   w^q_i
             double t_array[max_length][3];
+            double t_o[3];
             Quaterniond q_array[max_length];
+            Quaterniond q_o;
             double euler_array[max_length][3];
+            double euler_o[3];
             double sequence_array[max_length];
 
             ceres::Problem problem;

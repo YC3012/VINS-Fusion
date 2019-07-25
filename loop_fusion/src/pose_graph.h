@@ -1,8 +1,8 @@
 /*******************************************************
  * Copyright (C) 2019, Aerial Robotics Group, Hong Kong University of Science and Technology
- * 
+ *
  * This file is part of VINS.
- * 
+ *
  * Licensed under the GNU General Public License v3.0;
  * you may not use this file except in compliance with the License.
  *
@@ -63,9 +63,12 @@ public:
 	Vector3d t_drift;
 	double yaw_drift;
 	Matrix3d r_drift;
-	// world frame( base sequence or first sequence)<----> cur sequence frame  
+	// world frame( base sequence or first sequence)<----> cur sequence frame
 	Vector3d w_t_vio;
 	Matrix3d w_r_vio;
+	Vector3d o_t_vio;
+	Matrix3d o_r_vio;
+	bool has_qr;
 
 
 private:
@@ -210,7 +213,7 @@ struct FourDOFError
 	}
 
 	static ceres::CostFunction* Create(const double t_x, const double t_y, const double t_z,
-									   const double relative_yaw, const double pitch_i, const double roll_i) 
+									   const double relative_yaw, const double pitch_i, const double roll_i)
 	{
 	  return (new ceres::AutoDiffCostFunction<
 	          FourDOFError, 4, 1, 3, 1, 3>(
@@ -256,7 +259,7 @@ struct FourDOFWeightError
 	}
 
 	static ceres::CostFunction* Create(const double t_x, const double t_y, const double t_z,
-									   const double relative_yaw, const double pitch_i, const double roll_i) 
+									   const double relative_yaw, const double pitch_i, const double roll_i)
 	{
 	  return (new ceres::AutoDiffCostFunction<
 	          FourDOFWeightError, 4, 1, 3, 1, 3>(
@@ -271,10 +274,10 @@ struct FourDOFWeightError
 
 struct RelativeRTError
 {
-	RelativeRTError(double t_x, double t_y, double t_z, 
+	RelativeRTError(double t_x, double t_y, double t_z,
 					double q_w, double q_x, double q_y, double q_z,
 					double t_var, double q_var)
-				  :t_x(t_x), t_y(t_y), t_z(t_z), 
+				  :t_x(t_x), t_y(t_y), t_z(t_z),
 				   q_w(q_w), q_x(q_x), q_y(q_y), q_z(q_z),
 				   t_var(t_var), q_var(q_var){}
 
@@ -309,7 +312,7 @@ struct RelativeRTError
 		QuaternionInverse(relative_q, relative_q_inv);
 
 		T error_q[4];
-		ceres::QuaternionProduct(relative_q_inv, q_i_j, error_q); 
+		ceres::QuaternionProduct(relative_q_inv, q_i_j, error_q);
 
 		residuals[3] = T(2) * error_q[1] / T(q_var);
 		residuals[4] = T(2) * error_q[2] / T(q_var);
@@ -320,7 +323,7 @@ struct RelativeRTError
 
 	static ceres::CostFunction* Create(const double t_x, const double t_y, const double t_z,
 									   const double q_w, const double q_x, const double q_y, const double q_z,
-									   const double t_var, const double q_var) 
+									   const double t_var, const double q_var)
 	{
 	  return (new ceres::AutoDiffCostFunction<
 	          RelativeRTError, 6, 4, 3, 4, 3>(
